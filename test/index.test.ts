@@ -12,7 +12,7 @@ describe('index', () => {
     afterEach(() => {
       server.close();
     });
-    it('captures response body', function(done) {
+    it('captures response body', done => {
       server = http.createServer(({}, res) => {
         interceptResponse(res).then(async whatWgResponse => {
           const body = await whatWgResponse.text();

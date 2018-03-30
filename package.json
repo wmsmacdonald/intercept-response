@@ -1,5 +1,5 @@
 {
-  "name": "deltaflate-server",
+  "name": "intercept-response",
   "version": "0.1.0",
   "description": "Collects writes to Node.js http.ServerResponse",
   "main": "lib/index.js",
