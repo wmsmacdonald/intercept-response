@@ -1,0 +1,41 @@
+{
+  "name": "deltaflate-server",
+  "version": "0.1.0",
+  "description": "Collects writes to Node.js http.ServerResponse",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "tsc && mocha --require ts-node/register test/**/*.test.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wmsmacdonald/intercept-response.git"
+  },
+  "keywords": [
+    "capture",
+    "http"
+  ],
+  "author": "William MacDonald",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wmsmacdonald/intercept-response/issues"
+  },
+  "homepage": "https://github.com/wmsmacdonald/intercept-response#readme",
+  "dependencies": {
+    "@types/lodash": "^4.14.106",
+    "@types/node": "^9.6.1",
+    "@types/node-fetch": "^1.6.7",
+    "node-fetch": "^2.1.2"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.1.2",
+    "@types/mocha": "^5.0.0",
+    "@types/sinon": "^4.3.0",
+    "chai": "^4.1.2",
+    "mocha": "^5.0.5",
+    "ts-node": "^5.0.1",
+    "typescript": "^2.8.1"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "declaration": true,
+    "noImplicitAny": false,
+    "allowSyntheticDefaultImports": false,
+    "pretty": true,
+    "removeComments": true,
+    "lib": ["es6", "esnext.asynciterable", "es2017.object"],
+    "types": ["@types/node"],
+    "rootDirs": ["./src", "./test"],
+    "outDir": "lib",
+    "typeRoots": ["node_modules/@types"],
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  },
+  "exclude": ["node_modules", "lib"]
+}
