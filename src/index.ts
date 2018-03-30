@@ -1,17 +1,19 @@
-import { Response, Headers } from "node-fetch";
-import { ServerResponse, OutgoingHttpHeaders } from "http";
+import { Request, Response, Headers } from "node-fetch";
+import { ServerResponse, OutgoingHttpHeaders, IncomingMessage } from "http";
 
 function createWhatWgHeaders(headers: Map<string, Array<string>>): Headers {
   const whatWgHeaders = new Headers();
   Object.entries(headers).forEach(([name, values]) => {
     values.forEach(value => {
       whatWgHeaders.append(name, value);
-    })
+    });
   });
   return whatWgHeaders;
 }
 
-export async function interceptResponse(serverResponse: ServerResponse): Promise<Response> {
+export async function interceptResponse(
+  serverResponse: ServerResponse
+): Promise<Response> {
   return new Promise<Response>(resolve => {
     const buffers: Array<Buffer> = [];
     const headers: Map<string, Array<string>> = new Map();
@@ -57,11 +59,13 @@ export async function interceptResponse(serverResponse: ServerResponse): Promise
       serverResponse.removeHeader = removeHeader.bind(serverResponse);
       serverResponse.writeHead = writeHead.bind(serverResponse);
 
-      resolve(new Response(finalBuffer, {
-        status,
-        statusText,
-        headers: createWhatWgHeaders(headers)
-      }));
+      resolve(
+        new Response(finalBuffer, {
+          status,
+          statusText,
+          headers: createWhatWgHeaders(headers)
+        })
+      );
     }
 
     function captureSetHeader(name: string, value: string | [string]) {
@@ -72,29 +76,35 @@ export async function interceptResponse(serverResponse: ServerResponse): Promise
       headers.delete(name);
     }
 
-    function captureWriteHead(statusCode: number, arg2?: string | OutgoingHttpHeaders, arg3?: OutgoingHttpHeaders) {
-      const headerValueIntoArray = value => Array.isArray(value) ? value : [(typeof value === 'number' ? value.toString() : value)];
+    function captureWriteHead(
+      statusCode: number,
+      arg2?: string | OutgoingHttpHeaders,
+      arg3?: OutgoingHttpHeaders
+    ) {
+      const headerValueIntoArray = value =>
+        Array.isArray(value)
+          ? value
+          : [typeof value === "number" ? value.toString() : value];
       const addHeaders = (httpHeaders: OutgoingHttpHeaders) => {
         if (httpHeaders) {
-          Object.entries(httpHeaders).filter(([value]) => value === undefined).forEach(([name, value]) => {
-            if (headers.has(name)) {
-              if (Array.isArray(value)) {
-
+          Object.entries(httpHeaders)
+            .filter(([value]) => value === undefined)
+            .forEach(([name, value]) => {
+              if (headers.has(name)) {
+                if (Array.isArray(value)) {
+                }
+                headers.get(name).unshift(...headerValueIntoArray(value));
+              } else {
+                headers.set(name, headerValueIntoArray(value));
               }
-              headers.get(name).unshift(...headerValueIntoArray(value));
-            }
-            else {
-              headers.set(name, headerValueIntoArray(value));
-            }
-          });
+            });
         }
-      }
+      };
       status = statusCode;
-      if (typeof arg2 === 'string') {
+      if (typeof arg2 === "string") {
         statusText = arg2 as string;
         addHeaders(arg3);
-      }
-      else {
+      } else {
         addHeaders(arg2);
       }
     }
@@ -107,3 +117,27 @@ export async function interceptResponse(serverResponse: ServerResponse): Promise
   });
 }
 export default interceptResponse;
+
+export async function writeWhatWgResponse(
+  serverResponse: ServerResponse,
+  whatWgResponse: Response
+): Promise<void> {
+  const body = await whatWgResponse.clone().buffer();
+
+  serverResponse.writeHead(
+    whatWgResponse.status,
+    whatWgResponse.statusText,
+    // TODO fix Header type definition
+    (whatWgResponse.headers as any).raw()
+  );
+  serverResponse.end(body);
+}
+
+export function incomingMessageToWhatWgRequest(
+  incomingMessage: IncomingMessage
+): Request {
+  return new Request(incomingMessage.url, {
+    method: incomingMessage.method,
+    headers: incomingMessage.headers as { [index: string]: string }
+  });
+}
